@@ -3,62 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat - AI Chatbot</title>
+    <title>Chat - AI ChatBot</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>AI Chat Interface</h1>
-            <p class="tagline">Start conversing with our intelligent assistant</p>
-        </header>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">AI ChatBot</div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="registration.html">Register</a>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-        <main>
-            <section class="chat-interface">
-                <h2>Chat Window</h2>
-                <div class="chat-container">
-                    <div class="chat-messages">
-                        <div class="message ai-message">
-                            <div class="message-content">
-                                <p>Hello! I'm your AI assistant. How can I help you today?</p>
-                                <span class="timestamp">Just now</span>
-                            </div>
-                        </div>
-                        <div class="message user-message">
-                            <div class="message-content">
-                                <p>[Placeholder for user message]</p>
-                                <span class="timestamp">Just now</span>
-                            </div>
-                        </div>
-                        <div class="message ai-message">
-                            <div class="message-content">
-                                <p>[Placeholder for AI response]</p>
-                                <span class="timestamp">Just now</span>
-                            </div>
-                        </div>
-                    </div>
+    <main class="container">
+        <h1 style="text-align: center; margin: 2rem 0; color: #d49a6a;">Chat with AI</h1>
+        
+        <div class="chat-container">
+            <div class="chat-messages">
+                <div class="message bot-message">
+                    Hello! I'm an AI assistant. How can I help you today?
+                </div>
+                <div class="message user-message">
+                    Hi, can you tell me about yourself?
+                </div>
+                <div class="message bot-message">
+                    [Placeholder response from AI model]
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message here...">
+                <button class="btn">Send</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 AI ChatBot. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Placeholder JavaScript for chat functionality
+        document.querySelector('.chat-input button').addEventListener('click', function() {
+            const input = document.querySelector('.chat-input input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user-message';
+                userMessage.textContent = message;
+                document.querySelector('.chat-messages').appendChild(userMessage);
+                
+                // Clear input
+                input.value = '';
+                
+                // Add placeholder bot response after a short delay
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot-message';
+                    botMessage.textContent = '[Placeholder response from AI model]';
+                    document.querySelector('.chat-messages').appendChild(botMessage);
                     
-                    <div class="chat-input-container">
-                        <div class="input-wrapper">
-                            <input type="text" class="chat-input" placeholder="Type your message here...">
-                            <button class="send-button">Send</button>
-                        </div>
-                        <p class="input-note">[Chat functionality will be implemented later]</p>
-                    </div>
-                </div>
-            </section>
+                    // Scroll to bottom
+                    document.querySelector('.chat-messages').scrollTop = document.querySelector('.chat-messages').scrollHeight;
+                }, 500);
+            }
+        });
 
-            <section class="navigation">
-                <div class="nav-buttons">
-                    <a href="index.html" class="btn secondary">Back to Home</a>
-                    <a href="register.html" class="btn primary">Register</a>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>&copy; 2024 AI Chatbot Project. All rights reserved.</p>
-        </footer>
-    </div>
+        // Allow sending message with Enter key
+        document.querySelector('.chat-input input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('.chat-input button').click();
+            }
+        });
+    </script>
 </body>
 </html>

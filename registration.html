@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AI ChatBot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">AI ChatBot</div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="registration.html">Register</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 style="text-align: center; margin: 2rem 0; color: #d49a6a;">Create an Account</h1>
+        
+        <div class="form-container">
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Choose a username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Create a password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" placeholder="Confirm your password">
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">Register</button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem;">
+                Already have an account? <a href="#" style="color: #ffa500;">Sign in here</a>
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 AI ChatBot. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Placeholder form submission handler
+        document.getElementById('registration-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Registration functionality will be implemented later.');
+        });
+    </script>
+</body>
+</html>
