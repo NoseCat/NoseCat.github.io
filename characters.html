@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manage AI Characters">
+    <title>Characters - AI Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accessibility.css">
+</head>
+<body>
+    <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
+    
+    <div class="container">
+        <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <div class="logo">AI Chat</div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="characters.html">Characters</a>
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+                <button class="mobile-nav-toggle" id="mobile-menu-btn">☰</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <h1>AI Character Library</h1>
+            
+            <div class="characters-controls">
+                <button id="create-character" class="btn primary">Create New Character</button>
+            </div>
+            
+            <section class="characters-grid" aria-label="Character library">
+                <div class="character-card" data-character-id="default">
+                    <h3>Default Assistant</h3>
+                    <p class="character-role">General Purpose AI</p>
+                    <p class="character-desc">Helpful, friendly, and knowledgeable assistant</p>
+                    <div class="character-actions">
+                        <button class="btn small use-character" data-character="default">Use</button>
+                        <button class="btn small edit-character" data-character="default">Edit</button>
+                    </div>
+                </div>
+                
+                <div class="character-card" data-character-id="scientist">
+                    <h3>Scientist</h3>
+                    <p class="character-role">Research Assistant</p>
+                    <p class="character-desc">Analytical, precise, data-driven responses</p>
+                    <div class="character-actions">
+                        <button class="btn small use-character" data-character="scientist">Use</button>
+                        <button class="btn small edit-character" data-character="scientist">Edit</button>
+                    </div>
+                </div>
+                
+                <div class="character-card" data-character-id="philosopher">
+                    <h3>Philosopher</h3>
+                    <p class="character-role">Deep Thinker</p>
+                    <p class="character-desc">Thoughtful, contemplative, existential discussions</p>
+                    <div class="character-actions">
+                        <button class="btn small use-character" data-character="philosopher">Use</button>
+                        <button class="btn small edit-character" data-character="philosopher">Edit</button>
+                    </div>
+                </div>
+                
+                <div class="character-card" data-character-id="comedian">
+                    <h3>Comedian</h3>
+                    <p class="character-role">Entertainer</p>
+                    <p class="character-desc">Witty, humorous, light-hearted conversations</p>
+                    <div class="character-actions">
+                        <button class="btn small use-character" data-character="comedian">Use</button>
+                        <button class="btn small edit-character" data-character="comedian">Edit</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="page-footer">
+            <p>&copy; 2025 AI Chat. No rights reserved.</p>
+        </footer>
+    </div>
+    
+    <!-- Character Editor Modal -->
+    <div id="character-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Edit Character</h2>
+            <form id="character-form">
+                <input type="hidden" id="character-id">
+                
+                <div class="form-group">
+                    <label for="character-name">Character Name</label>
+                    <input type="text" id="character-name" placeholder="Enter character name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="character-role">Role/Personality</label>
+                    <input type="text" id="character-role" placeholder="e.g., Scientist, Philosopher" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="character-desc">Description</label>
+                    <textarea id="character-desc" rows="2" placeholder="Brief description of this character"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="character-prompt">System Prompt</label>
+                    <textarea id="character-prompt" rows="6" placeholder="Enter the system prompt that defines this character's behavior" required></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn primary">Save Character</button>
+                    <button type="button" id="close-modal" class="btn secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="common.js"></script>
+    <script src="characters.js"></script>
+</body>
+</html>

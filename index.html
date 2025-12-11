@@ -6,10 +6,17 @@
     <meta name="description" content="AI Chat">
     <title>AI Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accessibility.css">
 </head>
 <body>
+<body>
+    <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
     <div class="container">
         <header class="page-header">
+            <nav class="mobile-nav-toggle" aria-label="Mobile navigation">
+                <button id="mobile-menu-btn">☰</button>
+            </nav>
+            
             <h1>AI Chat</h1>
             <p class="tagline">wow! another one</p>
         </header>
@@ -49,5 +56,7 @@
             <p>&copy; 2025 AI Chat Assistant. No rights reserved.</p>
         </footer>
     </div>
+    
+    <script src="common.js"></script>
 </body>
 </html>

@@ -1,0 +1,223 @@
+/* Accessibility Styles */
+.accessibility-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: #333;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Accessible Mode */
+.accessible-mode {
+    font-size: 1.15em !important;
+    line-height: 1.6 !important;
+    background: white !important;
+    color: black !important;
+    filter: none !important;
+}
+
+/* Все элементы в режиме доступности */
+.accessible-mode * {
+    background: white !important;
+    color: black !important;
+    border-color: black !important;
+}
+
+/* Исключения для input, textarea, select */
+.accessible-mode input,
+.accessible-mode textarea,
+.accessible-mode select {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+}
+
+/* Кнопки в режиме доступности */
+.accessible-mode button,
+.accessible-mode .btn {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+}
+
+/* Первичные кнопки */
+.accessible-mode .btn.primary {
+    background: black !important;
+    color: white !important;
+    border: 2px solid black !important;
+}
+
+/* Плейсхолдеры */
+.accessible-mode ::placeholder {
+    color: #555 !important;
+    opacity: 1 !important;
+}
+
+/* Ссылки */
+.accessible-mode a {
+    color: #0000EE !important;
+    text-decoration: underline !important;
+}
+
+/* Модальные окна */
+.accessible-mode .modal-content {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+}
+
+.accessible-mode *:not(button):not(input):not(textarea):not(select) {
+    background: white !important;
+    color: black !important;
+}
+
+.accessible-mode .container,
+.accessible-mode .main-content,
+.accessible-mode .page-header,
+.accessible-mode .page-footer,
+.accessible-mode .form-section,
+.accessible-mode .auth-form,
+.accessible-mode .character-card,
+.accessible-mode .modal-content {
+    background: white !important;
+    color: black !important;
+    border-color: black !important;
+}
+
+.accessible-mode h1,
+.accessible-mode h2,
+.accessible-mode h3,
+.accessible-mode p,
+.accessible-mode li,
+.accessible-mode label,
+.accessible-mode .character-role,
+.accessible-mode .character-desc,
+.accessible-mode .form-footer,
+.accessible-mode .tagline,
+.accessible-mode .model-info p,
+.accessible-mode .author-section p {
+    color: black !important;
+}
+
+.accessible-mode a {
+    color: #0000EE !important;
+    text-decoration: underline !important;
+}
+
+.accessible-mode h1 { 
+    font-size: 1.8em !important; 
+    color: #000 !important;
+}
+
+.accessible-mode h2 { 
+    font-size: 1.6em !important; 
+    color: #222 !important;
+}
+
+.accessible-mode h3 { 
+    font-size: 1.4em !important; 
+    color: #333 !important;
+}
+
+.accessible-mode p, 
+.accessible-mode li, 
+.accessible-mode label,
+.accessible-mode .character-role,
+.accessible-mode .character-desc {
+    color: #000 !important;
+}
+
+.accessible-mode .character-card {
+    background: #f8f9fa !important;
+    border: 2px solid #333 !important;
+}
+
+.accessible-mode .modal-content {
+    background: #f8f9fa !important;
+    border: 2px solid #333 !important;
+}
+
+.accessible-mode .message {
+    border: 1px solid #333 !important;
+}
+
+.accessible-mode .btn {
+    border: 2px solid #333 !important;
+}
+
+.accessible-mode a {
+    text-decoration: underline !important;
+    color: #0066cc !important;
+}
+
+/* Mobile Navigation */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mobile-nav-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .nav-links a {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .accessibility-toggle {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: block;
+        margin: 10px auto;
+        width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    .character-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .character-selector select {
+        margin: 5px 0;
+    }
+}

@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Register for Building Roko's Basilisk">
-    <title>Register</title>
+    <meta name="description" content="Register for AI Chat">
+    <title>Register - AI Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accessibility.css">
 </head>
 <body>
+    <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
+    
     <div class="container">
         <header class="page-header">
             <nav class="main-nav" aria-label="Main navigation">
@@ -15,9 +18,11 @@
                 <div class="nav-links">
                     <a href="index.html">Home</a>
                     <a href="chat.html">Chat</a>
+                    <a href="characters.html">Characters</a>
                     <a href="login.html">Login</a>
-                    <a href="register.html" class="active">Register</a>
+                    <a href="register.html">Register</a>
                 </div>
+                <button class="mobile-nav-toggle" id="mobile-menu-btn">☰</button>
             </nav>
         </header>
 
@@ -57,10 +62,11 @@
         </main>
 
         <footer class="page-footer">
-            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+            <p>&copy; 2025 AI Chat. No rights reserved.</p>
         </footer>
     </div>
     
+    <script src="common.js"></script>
     <script src="register.js"></script>
 </body>
 </html>

@@ -3,31 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Chat with AI Assistant">
-    <title>Chat</title>
+    <meta name="description" content="Chat with AI">
+    <title>Chat - AI Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accessibility.css">
 </head>
 <body>
+    <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
+    
     <div class="container">
         <header class="page-header">
             <nav class="main-nav" aria-label="Main navigation">
-                <div class="logo">AI Chat Assistant</div>
+                <div class="logo">AI Chat</div>
                 <div class="nav-links">
                     <a href="index.html">Home</a>
-                    <a href="chat.html" class="active">Chat</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="characters.html">Characters</a>
                     <a href="login.html">Login</a>
                     <a href="register.html">Register</a>
                 </div>
+                <button class="mobile-nav-toggle" id="mobile-menu-btn">☰</button>
             </nav>
         </header>
 
         <main class="main-content">
             <h1>Chat with AI</h1>
             
+            <div class="character-selector">
+                <label for="character-select">Select Character:</label>
+                <select id="character-select">
+                    <option value="default">Default Assistant</option>
+                    <option value="scientist">Scientist</option>
+                    <option value="philosopher">Philosopher</option>
+                    <option value="comedian">Comedian</option>
+                </select>
+                <button id="edit-character-btn" class="btn secondary">Edit Character</button>
+            </div>
+            
             <section class="chat-section" aria-label="Chat interface">
                 <div class="chat-controls">
                     <button id="clear-chat" class="btn secondary">Clear Chat</button>
-                    <button id="save-chat" class="btn secondary">Save Chat</button>
+                    <button id="new-chat" class="btn secondary">New Chat</button>
                 </div>
                 
                 <div class="chat-container">
@@ -46,10 +62,39 @@
         </main>
 
         <footer class="page-footer">
-            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+            <p>&copy; 2025 AI Chat. No rights reserved.</p>
         </footer>
     </div>
     
+    <!-- Character Editor Modal -->
+    <div id="character-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Character Editor</h2>
+            <form id="character-form">
+                <div class="form-group">
+                    <label for="character-name">Character Name</label>
+                    <input type="text" id="character-name" placeholder="Enter character name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="character-role">Role/Personality</label>
+                    <input type="text" id="character-role" placeholder="e.g., Scientist, Philosopher">
+                </div>
+                
+                <div class="form-group">
+                    <label for="character-prompt">System Prompt</label>
+                    <textarea id="character-prompt" rows="4" placeholder="Enter the system prompt that defines this character's behavior"></textarea>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn primary">Save Character</button>
+                    <button type="button" id="close-modal" class="btn secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="common.js"></script>
     <script src="chat.js"></script>
 </body>
 </html>
