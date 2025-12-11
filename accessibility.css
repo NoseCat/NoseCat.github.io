@@ -164,6 +164,7 @@
     font-size: 1.5em;
     cursor: pointer;
     padding: 5px;
+    color:#e8d5b5;
 }
 
 /* Responsive Design */
@@ -179,13 +180,17 @@
         top: 100%;
         left: 0;
         right: 0;
-        background: white;
+        background: #5a3a2a;
         padding: 10px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     .nav-links.active {
         display: flex;
+    }
+
+    .main-nav {
+        position: relative; 
     }
     
     .nav-links a {
