@@ -3,53 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Chat with AI Assistant">
-    <title>Chat</title>
+    <meta name="description" content="Chat with AI">
+    <title>Chat - AI Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
 </head>
 <body>
+    <button class="accessibility-btn" id="accessibilityToggle" aria-label="Toggle accessibility mode">A+</button>
+    
     <div class="container">
         <header class="page-header">
             <nav class="main-nav" aria-label="Main navigation">
-                <div class="logo">AI Chat Assistant</div>
+                <button class="mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+                <div class="logo">AI Chat</div>
                 <div class="nav-links">
                     <a href="index.html">Home</a>
                     <a href="chat.html" class="active">Chat</a>
+                    <a href="characters.html">Characters</a>
                     <a href="login.html">Login</a>
                     <a href="register.html">Register</a>
                 </div>
             </nav>
+            <h1>Chat with AI</h1>
+            <p class="tagline">Powered by Mistral AI</p>
         </header>
 
         <main class="main-content">
-            <h1>Chat with AI</h1>
-            
             <section class="chat-section" aria-label="Chat interface">
                 <div class="chat-controls">
-                    <button id="clear-chat" class="btn secondary">Clear Chat</button>
-                    <button id="save-chat" class="btn secondary">Save Chat</button>
+                    <div class="character-selector">
+                        <label for="character-select">Character:</label>
+                        <select id="character-select">
+                            <option value="default">Default Assistant</option>
+                            <option value="creative">Creative Writer</option>
+                            <option value="custom">Custom Character</option>
+                        </select>
+                        <a href="characters.html" class="btn small">Manage Characters</a>
+                    </div>
+                    
+                    <div class="chat-actions">
+                        <button id="clear-chat" class="btn secondary">Clear Chat</button>
+                        <button id="new-chat" class="btn secondary">New Chat</button>
+                    </div>
                 </div>
                 
                 <div class="chat-container">
                     <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
                         <div class="message bot-message">
-                            <strong>AI:</strong> Hello! I'm an AI assistant. How can I help you today?
+                            <strong>AI:</strong> Hello! I'm your AI assistant. How can I help you today?
                         </div>
                     </div>
                     
-                    <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Type your message here..." aria-label="Type your message">
-                        <button id="send-btn" class="btn primary">Send</button>
+                    <div class="chat-input-area">
+                        <div class="prompt-info">
+                            <small>Current character: <span id="current-character">Default Assistant</span></small>
+                        </div>
+                        <div class="chat-input">
+                            <textarea id="message-input" placeholder="Type your message here..." 
+                                      rows="2" aria-label="Type your message"></textarea>
+                            <button id="send-btn" class="btn primary">Send</button>
+                        </div>
                     </div>
                 </div>
+            </section>
+            
+            <section class="api-info">
+                <details>
+                    <summary>API Configuration (Mistral)</summary>
+                    <div class="api-config">
+                        <p>Current endpoint: <code>https://api.mistral.ai/v1/chat/completions</code></p>
+                        <div class="api-status">
+                            <span class="status-indicator" id="api-status">API: Not Configured</span>
+                        </div>
+                        <button id="test-api" class="btn small tertiary">Test Connection</button>
+                    </div>
+                </details>
             </section>
         </main>
 
         <footer class="page-footer">
-            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+            <p>&copy; 2025 AI Chat Assistant. No rights reserved.</p>
         </footer>
     </div>
     
     <script src="chat.js"></script>
+    <script src="mobile.js"></script>
+    <script src="accessibility.js"></script>
 </body>
 </html>

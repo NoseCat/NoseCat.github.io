@@ -6,10 +6,24 @@
     <meta name="description" content="AI Chat">
     <title>AI Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
 </head>
 <body>
+    <button class="accessibility-btn" id="accessibilityToggle" aria-label="Toggle accessibility mode">A+</button>
+    
     <div class="container">
         <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <button class="mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+                <div class="logo">AI Chat</div>
+                <div class="nav-links">
+                    <a href="index.html" class="active">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="characters.html">Characters</a>
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+            </nav>
             <h1>AI Chat</h1>
             <p class="tagline">wow! another one</p>
         </header>
@@ -38,9 +52,8 @@
 
             <nav class="navigation" aria-label="Main navigation">
                 <div class="nav-buttons">
-                    <a href="register.html" class="btn primary">Register</a>
-                    <a href="login.html" class="btn secondary">Login</a>
-                    <a href="chat.html" class="btn tertiary">Start Chatting</a>
+                    <a href="characters.html" class="btn primary">Create Character</a>
+                    <a href="chat.html" class="btn secondary">Start Chatting</a>
                 </div>
             </nav>
         </main>
@@ -49,5 +62,8 @@
             <p>&copy; 2025 AI Chat Assistant. No rights reserved.</p>
         </footer>
     </div>
+    
+    <script src="mobile.js"></script>
+    <script src="accessibility.js"></script>
 </body>
 </html>

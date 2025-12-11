@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Character Editor for AI Chat">
+    <title>Character Editor - AI Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+</head>
+<body>
+    <button class="accessibility-btn" id="accessibilityToggle" aria-label="Toggle accessibility mode">A+</button>
+    
+    <div class="container">
+        <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <button class="mobile-menu-btn" aria-label="Menu" aria-expanded="false">☰</button>
+                <div class="logo">AI Chat</div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="characters.html" class="active">Characters</a>
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+            </nav>
+            <h1>Character Editor</h1>
+            <p class="tagline">Create custom AI personalities</p>
+        </header>
+
+        <main class="main-content">
+            <div class="characters-grid">
+                <section class="character-form-section">
+                    <h2>Create New Character</h2>
+                    <form id="character-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="character-name">Character Name</label>
+                            <input type="text" id="character-name" name="name" required 
+                                   placeholder="e.g., Helpful Assistant, Funny Bot, etc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="character-role">Role/Personality</label>
+                            <select id="character-role" name="role">
+                                <option value="assistant">AI Assistant</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="friend">Friend</option>
+                                <option value="expert">Expert</option>
+                                <option value="creative">Creative Writer</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="character-prompt">System Prompt</label>
+                            <textarea id="character-prompt" name="prompt" rows="6" required 
+                                      placeholder="Describe how this character should behave. This text will be inserted as a system prompt.">
+You are a helpful AI assistant. Be polite, concise, and accurate in your responses.</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="character-example">Example Dialogue (optional)</label>
+                            <textarea id="character-example" name="example" rows="4" 
+                                      placeholder="Example of how this character speaks..."></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn primary">Save Character</button>
+                            <button type="button" id="preview-btn" class="btn secondary">Preview</button>
+                            <button type="reset" class="btn tertiary">Reset</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="characters-list-section">
+                    <h2>Your Characters</h2>
+                    <div class="characters-list">
+                        <div class="character-card">
+                            <div class="character-card-header">
+                                <h3>Default Assistant</h3>
+                                <span class="character-badge">Default</span>
+                            </div>
+                            <p class="character-description">Helpful and polite AI assistant</p>
+                            <div class="character-actions">
+                                <button class="btn small" data-action="use">Use in Chat</button>
+                                <button class="btn small secondary" data-action="edit">Edit</button>
+                            </div>
+                        </div>
+                        
+                        <div class="character-card">
+                            <div class="character-card-header">
+                                <h3>Creative Writer</h3>
+                                <span class="character-badge">Creative</span>
+                            </div>
+                            <p class="character-description">Writes stories and poems</p>
+                            <div class="character-actions">
+                                <button class="btn small" data-action="use">Use in Chat</button>
+                                <button class="btn small secondary" data-action="edit">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="empty-state" id="empty-characters">
+                        <p>No characters created yet. Create your first character above!</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <p>&copy; 2025 AI Chat Assistant. No rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="characters.js"></script>
+    <script src="mobile.js"></script>
+    <script src="accessibility.js"></script>
+</body>
+</html>

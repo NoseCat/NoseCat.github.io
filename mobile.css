@@ -1,0 +1,134 @@
+/* Mobile Responsive Styles */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .main-nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 5px;
+        display: none;
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: 1px solid #d49a6a;
+        color: #d49a6a;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px 10px;
+    }
+    
+    .characters-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+    
+    .chat-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .character-selector {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 5px;
+    }
+    
+    .chat-input {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .chat-input textarea {
+        min-height: 60px;
+    }
+    
+    .chat-input .btn {
+        width: 100%;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    .character-card {
+        width: 100%;
+    }
+    
+    .page-header h1 {
+        font-size: 1.8rem;
+        margin-top: 20px;
+    }
+    
+    .tagline {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .nav-buttons .btn {
+        width: 100%;
+    }
+    
+    .character-form-section,
+    .characters-list-section {
+        padding: 15px;
+    }
+    
+    .chat-messages {
+        max-height: 300px;
+    }
+    
+    .message {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile-first: hide desktop elements by default */
+.mobile-menu-btn {
+    display: none;
+}
+
+/* Accessibility mode */
+body.accessibility-mode {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+body.accessibility-mode .btn {
+    padding: 12px 24px;
+    font-size: 18px;
+}
+
+body.accessibility-mode input,
+body.accessibility-mode textarea,
+body.accessibility-mode select {
+    font-size: 18px;
+    padding: 12px;
+}

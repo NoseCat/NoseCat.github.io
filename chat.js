@@ -1,18 +1,41 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Chat elements
     const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const clearBtn = document.getElementById('clear-chat');
-    const saveBtn = document.getElementById('save-chat');
+    const newChatBtn = document.getElementById('new-chat');
+    const characterSelect = document.getElementById('character-select');
+    const currentCharacterSpan = document.getElementById('current-character');
+    const testApiBtn = document.getElementById('test-api');
+    const apiStatus = document.getElementById('api-status');
     
-    // Load saved messages from localStorage
-    loadMessages();
+    // Character system prompts
+    const characterPrompts = {
+        default: "You are a helpful AI assistant. Be polite, concise, and accurate in your responses.",
+        creative: "You are a creative writer. Be imaginative, descriptive, and focus on storytelling.",
+        custom: "You are a custom AI character. Adapt to the user's needs."
+    };
     
-    // Send message on button click
+    // Current character
+    let currentCharacter = 'default';
+    let currentSystemPrompt = characterPrompts.default;
+    
+    // Update character when selected
+    characterSelect.addEventListener('change', function(e) {
+        currentCharacter = e.target.value;
+        currentSystemPrompt = characterPrompts[currentCharacter] || characterPrompts.default;
+        currentCharacterSpan.textContent = characterSelect.options[characterSelect.selectedIndex].text;
+        
+        // Add system message to chat
+        addSystemMessage(`Switched to: ${characterSelect.options[characterSelect.selectedIndex].text}`);
+    });
+    
+    // Send message
     sendBtn.addEventListener('click', sendMessage);
     
-    // Send message on Enter key
-    messageInput.addEventListener('keypress', function(e) {
+    // Send on Enter (Ctrl+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
@@ -21,31 +44,61 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Clear chat
     clearBtn.addEventListener('click', function() {
-        if (confirm('Are you sure you want to clear the chat?')) {
-            chatMessages.innerHTML = '<div class="message bot-message"><strong>AI:</strong> Chat cleared. How can I help you?</div>';
-            localStorage.removeItem('chatHistory');
+        if (confirm('Clear all messages?')) {
+            chatMessages.innerHTML = `
+                <div class="message system-message">
+                    Chat cleared. Current character: <strong>${currentCharacterSpan.textContent}</strong>
+                </div>
+                <div class="message bot-message">
+                    <strong>AI:</strong> Hello! I'm ready to chat. How can I help you?
+                </div>
+            `;
         }
     });
     
-    // Save chat
-    saveBtn.addEventListener('click', function() {
-        const chatText = Array.from(chatMessages.children)
-            .map(msg => msg.textContent)
-            .join('\n');
-        
-        const blob = new Blob([chatText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'chat-history.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showNotification('Chat saved successfully!');
+    // New chat
+    newChatBtn.addEventListener('click', function() {
+        if (confirm('Start new chat with current character?')) {
+            chatMessages.innerHTML = `
+                <div class="message system-message">
+                    New chat started with: <strong>${currentCharacterSpan.textContent}</strong>
+                </div>
+                <div class="message bot-message">
+                    <strong>AI:</strong> Hello! Let's start a new conversation.
+                </div>
+            `;
+        }
     });
     
+    // Test API connection
+    testApiBtn.addEventListener('click', function() {
+        apiStatus.textContent = 'API: Testing connection...';
+        apiStatus.style.color = '#ff9800';
+        
+        // Simulate API test (replace with actual API call later)
+        setTimeout(() => {
+            apiStatus.textContent = 'API: Connected (simulated)';
+            apiStatus.style.color = '#4CAF50';
+            
+            // Simulated Mistral API response format
+            const mockResponse = {
+                model: 'mistral-tiny',
+                created: new Date().toISOString(),
+                usage: { prompt_tokens: 10, completion_tokens: 20 },
+                message: 'API connection successful (simulated)'
+            };
+            
+            addSystemMessage(`API Test: ${JSON.stringify(mockResponse, null, 2)}`);
+        }, 1000);
+    });
+    
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Main send function
     function sendMessage() {
         const message = messageInput.value.trim();
         
@@ -54,73 +107,68 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add user message
         addMessage(message, 'user-message', 'You');
         
-        // Clear input
+        // Clear and reset input
         messageInput.value = '';
+        messageInput.style.height = 'auto';
         
-        // Simulate AI response (in real app, this would be an API call)
+        // Simulate AI processing
+        showTypingIndicator();
+        
+        // Simulate Mistral API call (replace with actual API later)
         setTimeout(() => {
-            const responses = [
-                "I'm an AI assistant. How can I help you today?",
-                "That's interesting! Tell me more.",
-                "I understand. Is there anything specific you'd like to know?",
-                "Thanks for sharing! I'm here to help with any questions.",
-                "Let me think about that... In the meantime, feel free to ask anything else!"
-            ];
-            
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-            addMessage(randomResponse, 'bot-message', 'AI');
-        }, 500);
-        
-        // Save to localStorage
-        saveMessages();
+            removeTypingIndicator();
+            simulateMistralResponse(message);
+        }, 1000 + Math.random() * 1000);
     }
     
+    // Add message to chat
     function addMessage(text, className, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${className}`;
-        messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        messageDiv.innerHTML = sender ? `<strong>${sender}:</strong> ${text}` : text;
         chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+    
+    // Add system message
+    function addSystemMessage(text) {
+        addMessage(text, 'system-message', 'System');
+    }
+    
+    // Simulate Mistral API response
+    function simulateMistralResponse(userMessage) {
+        const responses = [
+            `Based on your character settings (${currentCharacter}), I understand you said: "${userMessage}"`,
+            `I'm responding as your ${currentCharacter} character. That's an interesting point about "${userMessage.substring(0, 20)}..."`,
+            `[Mistral AI response simulation] I've processed your message with the current system prompt.`,
+            `As your AI assistant (${currentCharacter}), I'd like to help you with that.`,
+            `Character: ${currentCharacter}. Prompt applied. Response generated.`
+        ];
+        
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        addMessage(randomResponse, 'bot-message', 'AI');
+    }
+    
+    // Typing indicator
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typing-indicator';
+        typingDiv.className = 'message bot-message typing';
+        typingDiv.innerHTML = '<strong>AI:</strong> <span class="typing-dots">...</span>';
+        chatMessages.appendChild(typingDiv);
+        scrollToBottom();
+    }
+    
+    function removeTypingIndicator() {
+        const typing = document.getElementById('typing-indicator');
+        if (typing) typing.remove();
+    }
+    
+    // Scroll to bottom
+    function scrollToBottom() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
     
-    function saveMessages() {
-        const messages = Array.from(chatMessages.children).map(msg => msg.innerHTML);
-        localStorage.setItem('chatHistory', JSON.stringify(messages));
-    }
-    
-    function loadMessages() {
-        const saved = localStorage.getItem('chatHistory');
-        if (saved) {
-            const messages = JSON.parse(saved);
-            chatMessages.innerHTML = '';
-            messages.forEach(msgHTML => {
-                const div = document.createElement('div');
-                div.innerHTML = msgHTML;
-                div.className = msgHTML.includes('You:</strong>') ? 'message user-message' : 'message bot-message';
-                chatMessages.appendChild(div);
-            });
-        }
-    }
-    
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 1000;
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
+    // Initialize
+    currentCharacterSpan.textContent = characterSelect.options[characterSelect.selectedIndex].text;
 });
