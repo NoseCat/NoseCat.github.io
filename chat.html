@@ -3,87 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat - AI ChatBot</title>
+    <meta name="description" content="Chat with AI Assistant">
+    <title>Chat</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">AI ChatBot</div>
+    <div class="container">
+        <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <div class="logo">AI Chat Assistant</div>
                 <div class="nav-links">
                     <a href="index.html">Home</a>
-                    <a href="chat.html">Chat</a>
+                    <a href="chat.html" class="active">Chat</a>
+                    <a href="login.html">Login</a>
                     <a href="register.html">Register</a>
                 </div>
             </nav>
-        </div>
-    </header>
+        </header>
 
-    <main class="container">
-        <h1 style="text-align: center; margin: 2rem 0; color: #d49a6a;">Chat with AI</h1>
-        
-        <div class="chat-container">
-            <div class="chat-messages">
-                <div class="message bot-message">
-                    Hello! I'm an AI assistant. How can I help you today?
-                </div>
-                <div class="message user-message">
-                    Hi, can you tell me about yourself?
-                </div>
-                <div class="message bot-message">
-                    [Placeholder response from AI model]
-                </div>
-            </div>
+        <main class="main-content">
+            <h1>Chat with AI</h1>
             
-            <div class="chat-input">
-                <input type="text" placeholder="Type your message here...">
-                <button class="btn">Send</button>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 AI ChatBot. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Placeholder JavaScript for chat functionality
-        document.querySelector('.chat-input button').addEventListener('click', function() {
-            const input = document.querySelector('.chat-input input');
-            const message = input.value.trim();
-            
-            if (message) {
-                // Add user message
-                const userMessage = document.createElement('div');
-                userMessage.className = 'message user-message';
-                userMessage.textContent = message;
-                document.querySelector('.chat-messages').appendChild(userMessage);
+            <section class="chat-section" aria-label="Chat interface">
+                <div class="chat-controls">
+                    <button id="clear-chat" class="btn secondary">Clear Chat</button>
+                    <button id="save-chat" class="btn secondary">Save Chat</button>
+                </div>
                 
-                // Clear input
-                input.value = '';
-                
-                // Add placeholder bot response after a short delay
-                setTimeout(() => {
-                    const botMessage = document.createElement('div');
-                    botMessage.className = 'message bot-message';
-                    botMessage.textContent = '[Placeholder response from AI model]';
-                    document.querySelector('.chat-messages').appendChild(botMessage);
+                <div class="chat-container">
+                    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                        <div class="message bot-message">
+                            <strong>AI:</strong> Hello! I'm an AI assistant. How can I help you today?
+                        </div>
+                    </div>
                     
-                    // Scroll to bottom
-                    document.querySelector('.chat-messages').scrollTop = document.querySelector('.chat-messages').scrollHeight;
-                }, 500);
-            }
-        });
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Type your message here..." aria-label="Type your message">
+                        <button id="send-btn" class="btn primary">Send</button>
+                    </div>
+                </div>
+            </section>
+        </main>
 
-        // Allow sending message with Enter key
-        document.querySelector('.chat-input input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.querySelector('.chat-input button').click();
-            }
-        });
-    </script>
+        <footer class="page-footer">
+            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="chat.js"></script>
 </body>
 </html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to AI Chat Assistant">
+    <title>Login - AI Chat Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <div class="logo">AI Chat Assistant</div>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="chat.html">Chat</a>
+                    <a href="login.html" class="active">Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <h1>Login</h1>
+            
+            <section class="form-section" aria-labelledby="login-heading">
+                <h2 id="login-heading" class="visually-hidden">Login Form</h2>
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" required placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" name="password" required placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="btn primary">Login</button>
+                </form>
+                
+                <p class="form-footer">
+                    Don't have an account? <a href="register.html">Register here</a>
+                </p>
+            </section>
+        </main>
+
+        <footer class="page-footer">
+            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="login.js"></script>
+</body>
+</html>

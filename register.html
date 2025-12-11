@@ -3,69 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - AI ChatBot</title>
+    <meta name="description" content="Register for Building Roko's Basilisk">
+    <title>Register</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">AI ChatBot</div>
+    <div class="container">
+        <header class="page-header">
+            <nav class="main-nav" aria-label="Main navigation">
+                <div class="logo">AI Chat</div>
                 <div class="nav-links">
                     <a href="index.html">Home</a>
                     <a href="chat.html">Chat</a>
-                    <a href="register.html">Register</a>
+                    <a href="login.html">Login</a>
+                    <a href="register.html" class="active">Register</a>
                 </div>
             </nav>
-        </div>
-    </header>
+        </header>
 
-    <main class="container">
-        <h1 style="text-align: center; margin: 2rem 0; color: #d49a6a;">Create an Account</h1>
-        
-        <div class="form-container">
-            <form id="registration-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Choose a username">
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Create a password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" placeholder="Confirm your password">
-                </div>
-                
-                <button type="submit" class="btn" style="width: 100%;">Register</button>
-            </form>
+        <main class="main-content">
+            <h1>Create Account</h1>
             
-            <p style="text-align: center; margin-top: 1rem;">
-                Already have an account? <a href="#" style="color: #ffa500;">Sign in here</a>
-            </p>
-        </div>
-    </main>
+            <section class="form-section" aria-labelledby="form-heading">
+                <h2 id="form-heading" class="visually-hidden">Registration Form</h2>
+                <form id="registration-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required placeholder="Choose a username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Create a password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required placeholder="Confirm your password">
+                    </div>
+                    
+                    <button type="submit" class="btn primary">Register</button>
+                </form>
+                
+                <p class="form-footer">
+                    Already have an account? <a href="login.html">Sign in here</a>
+                </p>
+            </section>
+        </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2023 AI ChatBot. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Placeholder form submission handler
-        document.getElementById('registration-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Registration functionality will be implemented later.');
-        });
-    </script>
+        <footer class="page-footer">
+            <p>&copy; 2025 AI Chat Assistant. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="register.js"></script>
 </body>
 </html>
