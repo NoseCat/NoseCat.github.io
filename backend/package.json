@@ -1,0 +1,16 @@
+{
+  "name": "ai-chat-backend",
+  "version": "1.0.0",
+  "description": "Simple backend for AI Chat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  }
+}

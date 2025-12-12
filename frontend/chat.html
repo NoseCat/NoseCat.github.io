@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="accessibility.css">
 </head>
+
 <body>
     <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
-    
+
     <div class="container">
         <header class="page-header">
             <nav class="main-nav" aria-label="Main navigation">
@@ -28,33 +30,31 @@
 
         <main class="main-content">
             <h1>Chat with AI</h1>
-            
+
             <div class="character-selector">
                 <label for="character-select">Select Character:</label>
                 <select id="character-select">
-                    <option value="default">Default Assistant</option>
-                    <option value="scientist">Scientist</option>
-                    <option value="philosopher">Philosopher</option>
-                    <option value="comedian">Comedian</option>
+                    <option value="">Loading characters...</option>
                 </select>
                 <button id="edit-character-btn" class="btn secondary">Edit Character</button>
             </div>
-            
+
             <section class="chat-section" aria-label="Chat interface">
                 <div class="chat-controls">
                     <button id="clear-chat" class="btn secondary">Clear Chat</button>
                     <button id="new-chat" class="btn secondary">New Chat</button>
                 </div>
-                
+
                 <div class="chat-container">
                     <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
                         <div class="message bot-message">
                             <strong>AI:</strong> Hello! I'm an AI assistant. How can I help you today?
                         </div>
                     </div>
-                    
+
                     <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Type your message here..." aria-label="Type your message">
+                        <input type="text" id="message-input" placeholder="Type your message here..."
+                            aria-label="Type your message">
                         <button id="send-btn" class="btn primary">Send</button>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
             <p>&copy; 2025 AI Chat. No rights reserved.</p>
         </footer>
     </div>
-    
+
     <!-- Character Editor Modal -->
     <div id="character-modal" class="modal" style="display: none;">
         <div class="modal-content">
@@ -75,17 +75,18 @@
                     <label for="character-name">Character Name</label>
                     <input type="text" id="character-name" placeholder="Enter character name">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="character-role">Role/Personality</label>
                     <input type="text" id="character-role" placeholder="e.g., Scientist, Philosopher">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="character-prompt">System Prompt</label>
-                    <textarea id="character-prompt" rows="4" placeholder="Enter the system prompt that defines this character's behavior"></textarea>
+                    <textarea id="character-prompt" rows="4"
+                        placeholder="Enter the system prompt that defines this character's behavior"></textarea>
                 </div>
-                
+
                 <div class="form-buttons">
                     <button type="submit" class="btn primary">Save Character</button>
                     <button type="button" id="close-modal" class="btn secondary">Cancel</button>
@@ -93,8 +94,9 @@
             </form>
         </div>
     </div>
-    
+
     <script src="common.js"></script>
     <script src="chat.js"></script>
 </body>
+
 </html>

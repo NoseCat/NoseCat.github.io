@@ -371,3 +371,16 @@ footer {
     color: inherit;
 }
 
+.username-display {
+    color: #d49a6a;
+    font-weight: bold;
+    margin-left: 20px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: rgba(90, 58, 42, 0.3);
+}
+
+.btn.small {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
