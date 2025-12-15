@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="accessibility.css">
 </head>
+
 <body>
     <button id="accessibility-toggle" class="accessibility-toggle">Accessible Mode</button>
-    
+
     <div class="container">
         <header class="page-header">
             <nav class="main-nav" aria-label="Main navigation">
@@ -28,13 +30,21 @@
 
         <main class="main-content">
             <h1>AI Character Library</h1>
-            
+
+            <!-- Поиск по персонажам -->
+            <div class="characters-search">
+                <input type="text" id="character-search-input"
+                    placeholder="Search characters by name or description...">
+                <button id="search-characters" class="btn secondary">Search</button>
+                <button id="reset-search" class="btn tertiary">Reset</button>
+            </div>
+
             <div class="characters-controls">
                 <button id="create-character" class="btn primary">Create New Character</button>
             </div>
-            
+
             <section class="characters-grid" aria-label="Character library">
-                
+                <!-- Персонажи будут загружены здесь -->
             </section>
         </main>
 
@@ -42,34 +52,43 @@
             <p>&copy; 2025 AI Chat. No rights reserved.</p>
         </footer>
     </div>
-    
+
     <!-- Character Editor Modal -->
     <div id="character-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2 id="modal-title">Edit Character</h2>
             <form id="character-form">
                 <input type="hidden" id="character-id">
-                
+
                 <div class="form-group">
                     <label for="character-name">Character Name</label>
                     <input type="text" id="character-name" placeholder="Enter character name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="character-role">Role/Personality</label>
                     <input type="text" id="character-role" placeholder="e.g., Scientist, Philosopher" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="character-desc">Description</label>
                     <textarea id="character-desc" rows="2" placeholder="Brief description of this character"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="character-prompt">System Prompt</label>
-                    <textarea id="character-prompt" rows="6" placeholder="Enter the system prompt that defines this character's behavior" required></textarea>
+                    <textarea id="character-prompt" rows="6"
+                        placeholder="Enter the system prompt that defines this character's behavior"
+                        required></textarea>
                 </div>
-                
+
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="character-is-public">
+                        Make character public (visible to all users)
+                    </label>
+                </div>
+
                 <div class="form-buttons">
                     <button type="submit" class="btn primary">Save Character</button>
                     <button type="button" id="close-modal" class="btn secondary">Cancel</button>
@@ -77,8 +96,8 @@
             </form>
         </div>
     </div>
-    
     <script src="common.js"></script>
     <script src="characters.js"></script>
 </body>
+
 </html>

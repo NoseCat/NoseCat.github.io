@@ -29,36 +29,60 @@
         </header>
 
         <main class="main-content">
-            <h1>Chat with AI</h1>
+            <div class="chat-layout">
+                <!-- Боковая панель с чатами -->
+                <aside class="chats-sidebar">
+                    <div class="chats-header">
+                        <h3>Your Chats</h3>
+                        <button id="new-chat-btn" class="btn small primary">+ New</button>
+                    </div>
+                    
+                    <div class="chat-search">
+                        <input type="text" id="chat-search-input" placeholder="Search chats...">
+                    </div>
+                    
+                    <div id="chats-list" class="chats-list">
+                        <!-- Чаты будут загружены здесь -->
+                    </div>
+                </aside>
 
-            <div class="character-selector">
-                <label for="character-select">Select Character:</label>
-                <select id="character-select">
-                    <option value="">Loading characters...</option>
-                </select>
-                <button id="edit-character-btn" class="btn secondary">Edit Character</button>
-            </div>
-
-            <section class="chat-section" aria-label="Chat interface">
-                <div class="chat-controls">
-                    <button id="clear-chat" class="btn secondary">Clear Chat</button>
-                    <button id="new-chat" class="btn secondary">New Chat</button>
-                </div>
-
-                <div class="chat-container">
-                    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
-                        <div class="message bot-message">
-                            <strong>AI:</strong> Hello! I'm an AI assistant. How can I help you today?
+                <!-- Основная область чата -->
+                <section class="chat-main">
+                    <div class="chat-header">
+                        <h1>Chat with AI</h1>
+                        
+                        <div class="character-selector">
+                            <label for="character-select">Select Character:</label>
+                            <select id="character-select">
+                                <option value="">Loading characters...</option>
+                            </select>
+                            <button id="edit-character-btn" class="btn secondary">Edit Character</button>
                         </div>
                     </div>
 
-                    <div class="chat-input">
-                        <input type="text" id="message-input" placeholder="Type your message here..."
-                            aria-label="Type your message">
-                        <button id="send-btn" class="btn primary">Send</button>
-                    </div>
-                </div>
-            </section>
+                    <section class="chat-section" aria-label="Chat interface">
+                        <div class="chat-controls">
+                            <button id="clear-chat" class="btn secondary">Clear Chat</button>
+                            <button id="new-chat" class="btn secondary">New Chat</button>
+                            <button id="rename-chat" class="btn secondary">Rename Chat</button>
+                        </div>
+
+                        <div class="chat-container">
+                            <div id="chat-messages" class="chat-messages" role="log" aria-live="polite">
+                                <div class="message bot-message">
+                                    <strong>AI:</strong> Hello! I'm an AI assistant. How can I help you today?
+                                </div>
+                            </div>
+
+                            <div class="chat-input">
+                                <input type="text" id="message-input" placeholder="Type your message here..."
+                                    aria-label="Type your message">
+                                <button id="send-btn" class="btn primary">Send</button>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </div>
         </main>
 
         <footer class="page-footer">
@@ -92,6 +116,21 @@
                     <button type="button" id="close-modal" class="btn secondary">Cancel</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Rename Chat Modal -->
+    <div id="rename-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Rename Chat</h2>
+            <div class="form-group">
+                <label for="new-chat-name">New Chat Name</label>
+                <input type="text" id="new-chat-name" placeholder="Enter new chat name">
+            </div>
+            <div class="form-buttons">
+                <button id="save-rename-btn" class="btn primary">Save</button>
+                <button id="cancel-rename-btn" class="btn secondary">Cancel</button>
+            </div>
         </div>
     </div>
 

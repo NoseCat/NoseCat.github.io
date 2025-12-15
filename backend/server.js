@@ -119,7 +119,7 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Получение персонажей пользователя
+// Получение персонажей пользователя (и публичных)
 app.get('/api/characters', async (req, res) => {
     try {
         await pool.query('set search_path = "schema_ai"');
@@ -133,8 +133,9 @@ app.get('/api/characters', async (req, res) => {
             });
         }
         
+        // Получаем персонажей пользователя И публичных персонажей
         const result = await pool.query(
-            'SELECT * FROM characters WHERE user_id = $1 ORDER BY created_at DESC',
+            'SELECT * FROM characters WHERE user_id = $1 OR is_public = true ORDER BY created_at DESC',
             [user_id]
         );
         
@@ -157,12 +158,12 @@ app.post('/api/characters', async (req, res) => {
     try {
         await pool.query('set search_path = "schema_ai"');
 
-        const { user_id, name, role, description, prompt, examples } = req.body;
+        const { user_id, name, role, description, prompt, examples, is_public } = req.body;
         
         const result = await pool.query(
-            `INSERT INTO characters (user_id, name, role, description, prompt, examples) 
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [user_id, name, role, description, prompt, examples]
+            `INSERT INTO characters (user_id, name, role, description, prompt, examples, is_public) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [user_id, name, role, description, prompt, examples, is_public || false]
         );
         
         res.json({ 
@@ -178,6 +179,49 @@ app.post('/api/characters', async (req, res) => {
         });
     }
 });
+
+// Поиск персонажей с фильтрами
+app.get('/api/characters/search', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { user_id, search } = req.query;
+        
+        if (!user_id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User ID is required' 
+            });
+        }
+        
+        let query = 'SELECT * FROM characters WHERE (user_id = $1 OR is_public = true)';
+        let params = [user_id];
+        let paramIndex = 2;
+        
+        if (search) {
+            query += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+        
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true,
+            characters: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Characters search error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
 
 // Получение одного персонажа по ID
 app.get('/api/characters/:id', async (req, res) => {
@@ -213,18 +257,20 @@ app.get('/api/characters/:id', async (req, res) => {
 });
 
 // Обновление персонажа
+
+// Обновление персонажа
 app.put('/api/characters/:id', async (req, res) => {
     try {
         await pool.query('set search_path = "schema_ai"');
 
         const { id } = req.params;
-        const { name, role, description, prompt, examples } = req.body;
+        const { name, role, description, prompt, examples, is_public } = req.body;
         
         const result = await pool.query(
             `UPDATE characters 
-             SET name = $1, role = $2, description = $3, prompt = $4, examples = $5
-             WHERE id = $6 RETURNING *`,
-            [name, role, description, prompt, examples, id]
+             SET name = $1, role = $2, description = $3, prompt = $4, examples = $5, is_public = $6
+             WHERE id = $7 RETURNING *`,
+            [name, role, description, prompt, examples, is_public || false, id]
         );
         
         if (result.rows.length === 0) {
@@ -329,6 +375,216 @@ app.post('/api/chat/completions', async (req, res) => {
             response: "I'm currently having trouble connecting to my AI model. Please make sure Mistral is running on http://127.0.0.1:1234",
             error: error.message,
             fallback: true
+        });
+    }
+});
+
+// Получение списка чатов пользователя
+app.get('/api/chats', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { user_id, search } = req.query;
+        
+        if (!user_id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User ID is required' 
+            });
+        }
+        
+        let query = 'SELECT * FROM chats WHERE user_id = $1';
+        let params = [user_id];
+        
+        if (search) {
+            query += ' AND name ILIKE $2';
+            params.push(`%${search}%`);
+        }
+        
+        query += ' ORDER BY updated_at DESC';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true,
+            chats: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Chats fetch error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Создание нового чата
+app.post('/api/chats', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { user_id, name } = req.body;
+        
+        // Если имя не указано, генерируем автоматическое
+        let chatName = name;
+        if (!chatName) {
+            // Находим последний чат пользователя для нумерации
+            const lastChat = await pool.query(
+                'SELECT name FROM chats WHERE user_id = $1 AND name LIKE $2 ORDER BY created_at DESC LIMIT 1',
+                [user_id, 'Чат %']
+            );
+            
+            if (lastChat.rows.length > 0) {
+                const lastNumber = parseInt(lastChat.rows[0].name.replace('Чат ', ''));
+                chatName = `Чат ${lastNumber + 1}`;
+            } else {
+                chatName = 'Чат 1';
+            }
+        }
+        
+        const result = await pool.query(
+            'INSERT INTO chats (user_id, name) VALUES ($1, $2) RETURNING *',
+            [user_id, chatName]
+        );
+        
+        res.json({ 
+            success: true,
+            chat: result.rows[0] 
+        });
+        
+    } catch (error) {
+        console.error('Create chat error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Обновление названия чата
+app.put('/api/chats/:id', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { id } = req.params;
+        const { name } = req.body;
+        
+        const result = await pool.query(
+            `UPDATE chats SET name = $1, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $2 RETURNING *`,
+            [name, id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Chat not found' 
+            });
+        }
+        
+        res.json({ 
+            success: true,
+            chat: result.rows[0] 
+        });
+        
+    } catch (error) {
+        console.error('Update chat error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Удаление чата
+app.delete('/api/chats/:id', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { id } = req.params;
+        
+        const result = await pool.query(
+            'DELETE FROM chats WHERE id = $1 RETURNING id',
+            [id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Chat not found' 
+            });
+        }
+        
+        res.json({ 
+            success: true,
+            message: 'Chat deleted successfully' 
+        });
+        
+    } catch (error) {
+        console.error('Delete chat error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Сохранение сообщения в чат
+app.post('/api/chats/:chat_id/messages', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { chat_id } = req.params;
+        const { role, content } = req.body;
+        
+        // Обновляем время обновления чата
+        await pool.query(
+            'UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+            [chat_id]
+        );
+        
+        const result = await pool.query(
+            'INSERT INTO messages (chat_id, role, content) VALUES ($1, $2, $3) RETURNING *',
+            [chat_id, role, content]
+        );
+        
+        res.json({ 
+            success: true,
+            message: result.rows[0] 
+        });
+        
+    } catch (error) {
+        console.error('Save message error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение сообщений чата
+app.get('/api/chats/:chat_id/messages', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+
+        const { chat_id } = req.params;
+        
+        const result = await pool.query(
+            'SELECT * FROM messages WHERE chat_id = $1 ORDER BY created_at ASC',
+            [chat_id]
+        );
+        
+        res.json({ 
+            success: true,
+            messages: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Get messages error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
         });
     }
 });
