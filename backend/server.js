@@ -24,41 +24,6 @@ const pool = new Pool({
     port: 5432,
 });
 
-// Создание таблиц если их нет
-async function initDatabase() {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                email VARCHAR(100) UNIQUE NOT NULL,
-                password_hash VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS characters (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-                name VARCHAR(100) NOT NULL,
-                role VARCHAR(100),
-                description TEXT,
-                prompt TEXT,
-                examples TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        
-        console.log('Database initialized');
-    } catch (error) {
-        console.error('Database initialization error:', error);
-    }
-}
-
-// Инициализация базы данных при старте
-//initDatabase();
-
 // Регистрация
 app.post('/api/register', async (req, res) => {
     try {
@@ -214,12 +179,6 @@ app.post('/api/characters', async (req, res) => {
     }
 });
 
-// Запуск сервера
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    console.log(`Frontend served from: ${path.join(__dirname, '../frontend')}`);
-});
-
 // Получение одного персонажа по ID
 app.get('/api/characters/:id', async (req, res) => {
     try {
@@ -320,4 +279,98 @@ app.delete('/api/characters/:id', async (req, res) => {
             message: 'Server error' 
         });
     }
+});
+
+// Новый endpoint для взаимодействия с Mistral API
+app.post('/api/chat/completions', async (req, res) => {
+    try {
+        const { messages, character_id, temperature = 0.7, max_tokens = 500 } = req.body;
+        
+        if (!messages || !Array.isArray(messages)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Messages array is required'
+            });
+        }
+        
+        // Формируем запрос к локальному Mistral
+        const mistralResponse = await fetch('http://127.0.0.1:1234/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: "mistralai/ministral-3-3b",
+                messages: messages,
+                temperature: temperature,
+                max_tokens: max_tokens,
+                stream: false
+            })
+        });
+        
+        if (!mistralResponse.ok) {
+            throw new Error(`Mistral API error: ${mistralResponse.status}`);
+        }
+        
+        const data = await mistralResponse.json();
+        
+        res.json({
+            success: true,
+            response: data.choices[0].message.content,
+            usage: data.usage
+        });
+        
+    } catch (error) {
+        console.error('Mistral API error:', error);
+        
+        // Fallback response если Mistral недоступен
+        res.json({
+            success: true,
+            response: "I'm currently having trouble connecting to my AI model. Please make sure Mistral is running on http://127.0.0.1:1234",
+            error: error.message,
+            fallback: true
+        });
+    }
+});
+
+// Получение информации о статусе Mistral
+app.get('/api/mistral/status', async (req, res) => {
+    try {
+        const statusResponse = await fetch('http://127.0.0.1:1234/v1/models', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (statusResponse.ok) {
+            const data = await statusResponse.json();
+            res.json({
+                success: true,
+                available: true,
+                models: data.data,
+                message: 'Mistral is running and ready'
+            });
+        } else {
+            res.json({
+                success: false,
+                available: false,
+                message: 'Mistral is not responding'
+            });
+        }
+        
+    } catch (error) {
+        res.json({
+            success: false,
+            available: false,
+            message: 'Cannot connect to Mistral: ' + error.message
+        });
+    }
+});
+
+// Запуск сервера
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Frontend served from: ${path.join(__dirname, '../frontend')}`);
+    console.log(`Mistral API endpoint: http://127.0.0.1:1234/v1/chat/completions`);
 });

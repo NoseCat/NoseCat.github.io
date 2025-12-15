@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('modal-title');
     
     let editingCharacterId = null;
+    let currentUser = null;
     
     // Загружаем персонажей при загрузке страницы
     loadCharacters();
@@ -39,25 +40,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function loadCharacters() {
-        const user = JSON.parse(localStorage.getItem('user'));
+        currentUser = JSON.parse(localStorage.getItem('user'));
         
-        if (!user) {
+        if (!currentUser) {
             alert('Please login first');
             window.location.href = 'login.html';
             return;
         }
         
+        // Добавляем имя пользователя в навигацию
+        addUsernameToNav(currentUser.username);
+        
         try {
-            const response = await fetch(`http://localhost:3000/api/characters?user_id=${user.id}`);
+            const response = await fetch(`http://localhost:3000/api/characters?user_id=${currentUser.id}`);
             const data = await response.json();
             
             if (data.success) {
                 renderCharacters(data.characters);
-                // Добавляем имя пользователя в навигацию
-                addUsernameToNav(user.username);
+            } else {
+                charactersGrid.innerHTML = '<p>Error loading characters. Please try again.</p>';
             }
         } catch (error) {
             console.error('Error loading characters:', error);
+            charactersGrid.innerHTML = '<p>Error connecting to server. Please try again later.</p>';
         }
     }
     
@@ -67,7 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
         charactersGrid.innerHTML = '';
         
         if (characters.length === 0) {
-            charactersGrid.innerHTML = '<p>No characters yet. Create your first character!</p>';
+            charactersGrid.innerHTML = `
+                <div class="empty-state">
+                    <p>No characters yet. Create your first character!</p>
+                </div>
+            `;
             return;
         }
         
@@ -78,10 +87,10 @@ document.addEventListener('DOMContentLoaded', function() {
             card.innerHTML = `
                 <h3>${character.name}</h3>
                 <p class="character-role">${character.role}</p>
-                <p class="character-desc">${character.description}</p>
+                <p class="character-desc">${character.description || 'No description'}</p>
                 <div class="character-actions">
-                    <button class="btn small use-character" data-character="${character.id}">Use</button>
-                    <button class="btn small edit-character" data-character="${character.id}">Edit</button>
+                    <button class="btn small primary use-character" data-character="${character.id}">Chat</button>
+                    <button class="btn small secondary edit-character" data-character="${character.id}">Edit</button>
                     <button class="btn small danger delete-character" data-character="${character.id}">Delete</button>
                 </div>
             `;
@@ -112,6 +121,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function createNewCharacter() {
+        if (!currentUser) {
+            alert('Please login first');
+            return;
+        }
+        
         editingCharacterId = null;
         modalTitle.textContent = 'Create New Character';
         
@@ -123,9 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function editCharacter(characterId) {
-        const user = JSON.parse(localStorage.getItem('user'));
-        
-        if (!user) {
+        if (!currentUser) {
             alert('Please login first');
             return;
         }
@@ -154,9 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function saveCharacter() {
-        const user = JSON.parse(localStorage.getItem('user'));
-        
-        if (!user) {
+        if (!currentUser) {
             alert('Please login first');
             return;
         }
@@ -173,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const characterData = {
-            user_id: user.id,
+            user_id: currentUser.id,
             name,
             role,
             description,
@@ -183,21 +193,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             let response;
+            let method;
+            let url;
+            
             if (characterId) {
                 // Обновление существующего персонажа
-                response = await fetch(`http://localhost:3000/api/characters/${characterId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(characterData)
-                });
+                method = 'PUT';
+                url = `http://localhost:3000/api/characters/${characterId}`;
             } else {
                 // Создание нового персонажа
-                response = await fetch('http://localhost:3000/api/characters', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(characterData)
-                });
+                method = 'POST';
+                url = 'http://localhost:3000/api/characters';
             }
+            
+            response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(characterData)
+            });
             
             const data = await response.json();
             
@@ -215,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function deleteCharacter(characterId) {
-        if (!confirm('Are you sure you want to delete this character?')) {
+        if (!confirm('Are you sure you want to delete this character? This action cannot be undone.')) {
             return;
         }
         
@@ -244,14 +257,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function addUsernameToNav(username) {
-        // Проверяем, не добавлено ли уже имя пользователя
-        const existingUserDisplay = document.querySelector('.username-display');
-        if (existingUserDisplay) {
-            return; // Имя пользователя уже отображается
-        }
-        
         const navLinks = document.querySelector('.nav-links');
         if (navLinks && username) {
+            // Удаляем старое отображение если есть
+            const oldDisplay = navLinks.querySelector('.username-display');
+            if (oldDisplay) oldDisplay.remove();
+            
             const userSpan = document.createElement('span');
             userSpan.className = 'username-display';
             userSpan.innerHTML = `👤 ${username}`;
