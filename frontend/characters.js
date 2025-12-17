@@ -216,6 +216,8 @@ async function editCharacter(characterId) {
             document.getElementById('character-is-public').checked = data.character.is_public || false;
             
             characterModal.style.display = 'block';
+
+            await logAction('character_edit', { character_id: data.character.id });
         }
     } catch (error) {
         console.error('Error loading character:', error);
@@ -273,6 +275,7 @@ async function editCharacter(characterId) {
             const data = await response.json();
             
             if (data.success) {
+                await logAction('character_save', { character_id: data.character.id });
                 alert('Character saved successfully!');
                 characterModal.style.display = 'none';
                 loadCharacters();
@@ -298,6 +301,7 @@ async function editCharacter(characterId) {
             const data = await response.json();
             
             if (data.success) {
+                await logAction('character_delete', { character_id: characterId });
                 alert('Character deleted successfully!');
                 loadCharacters();
             } else {

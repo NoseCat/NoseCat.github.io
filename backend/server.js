@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const requestIp = require('request-ip');
 
 const app = express();
 const port = 3000;
@@ -11,6 +12,7 @@ const port = 3000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(requestIp.mw());
 
 // Serve static files from frontend folder
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -24,6 +26,596 @@ const pool = new Pool({
     port: 5432,
 });
 
+// Проверка прав администратора
+app.get('/api/admin/check-admin', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { user_id } = req.query;
+        
+        if (!user_id) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'User ID is required' 
+            });
+        }
+        
+        const result = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [user_id]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.json({ 
+                success: false, 
+                is_admin: false 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            is_admin: result.rows[0].is_admin 
+        });
+        
+    } catch (error) {
+        console.error('Check admin error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Запись лога
+app.post('/api/logs', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { user_id, action, details } = req.body;
+        
+        // Получаем IP-адрес и user-agent из запроса
+        const ip_address = req.clientIp; 
+        const user_agent = req.get('User-Agent');
+        
+        const result = await pool.query(
+            'INSERT INTO logs (user_id, action, details, ip_address, user_agent) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [user_id, action, details, ip_address, user_agent]
+        );
+        
+        res.json({ 
+            success: true, 
+            log: result.rows[0] 
+        });
+        
+    } catch (error) {
+        console.error('Log save error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение персонажей для админки
+app.get('/api/admin/characters', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id, search, filter } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        let query = `
+            SELECT c.*, u.username 
+            FROM characters c 
+            LEFT JOIN users u ON c.user_id = u.id 
+            WHERE 1=1
+        `;
+        let params = [];
+        let paramIndex = 1;
+        
+        if (search) {
+            query += ` AND (c.name ILIKE $${paramIndex} OR c.role ILIKE $${paramIndex})`;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+        
+        if (filter === 'public') {
+            query += ` AND c.is_public = true`;
+        } else if (filter === 'private') {
+            query += ` AND c.is_public = false`;
+        }
+        
+        query += ' ORDER BY c.created_at DESC';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true, 
+            characters: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Admin characters error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение чатов для админки
+app.get('/api/admin/chats', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id, search, filter } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        let query = `
+            SELECT c.*, u.username, 
+                   (SELECT COUNT(*) FROM messages m WHERE m.chat_id = c.id) as message_count
+            FROM chats c 
+            LEFT JOIN users u ON c.user_id = u.id 
+            WHERE 1=1
+        `;
+        let params = [];
+        let paramIndex = 1;
+        
+        if (search) {
+            query += ` AND c.name ILIKE $${paramIndex}`;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+        
+        if (filter === 'today') {
+            query += ` AND DATE(c.created_at) = CURRENT_DATE`;
+        } else if (filter === 'week') {
+            query += ` AND c.created_at >= CURRENT_DATE - INTERVAL '7 days'`;
+        }
+        
+        query += ' ORDER BY c.updated_at DESC';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true, 
+            chats: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Admin chats error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение статистики для дашборда
+app.get('/api/admin/stats', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        // Получаем статистику
+        const stats = {};
+        
+        // Общее количество пользователей
+        const usersResult = await pool.query('SELECT COUNT(*) FROM users');
+        stats.total_users = parseInt(usersResult.rows[0].count);
+        
+        // Активные сегодня
+        const today = new Date().toISOString().split('T')[0];
+        const activeResult = await pool.query(
+            'SELECT COUNT(DISTINCT user_id) FROM logs WHERE DATE(created_at) = $1',
+            [today]
+        );
+        stats.active_today = parseInt(activeResult.rows[0].count || 0);
+        
+        // Общее количество чатов
+        const chatsResult = await pool.query('SELECT COUNT(*) FROM chats');
+        stats.total_chats = parseInt(chatsResult.rows[0].count);
+        
+        // Общее количество персонажей
+        const charactersResult = await pool.query('SELECT COUNT(*) FROM characters');
+        stats.total_characters = parseInt(charactersResult.rows[0].count);
+        
+        // Общее количество сообщений
+        const messagesResult = await pool.query('SELECT COUNT(*) FROM messages');
+        stats.total_messages = parseInt(messagesResult.rows[0].count);
+        
+        // Статус Mistral
+        try {
+            const mistralStatus = await fetch('http://127.0.0.1:1234/v1/models');
+            stats.mistral_online = mistralStatus.ok;
+        } catch {
+            stats.mistral_online = false;
+        }
+        
+        res.json({ 
+            success: true, 
+            stats 
+        });
+        
+    } catch (error) {
+        console.error('Stats error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Недавние действия
+app.get('/api/admin/recent-activity', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        const result = await pool.query(
+            `SELECT l.*, u.username 
+             FROM logs l 
+             LEFT JOIN users u ON l.user_id = u.id 
+             ORDER BY l.created_at DESC 
+             LIMIT 50`
+        );
+        
+        res.json({ 
+            success: true, 
+            logs: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Recent activity error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение списка пользователей (только для админа)
+app.get('/api/admin/users', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id, search, filter } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        let query = 'SELECT id, username, email, is_admin, created_at FROM users';
+        let whereConditions = [];
+        let params = [];
+        
+        if (search) {
+            whereConditions.push('(username ILIKE $1 OR email ILIKE $1)');
+            params.push(`%${search}%`);
+        }
+        
+        if (filter === 'admin') {
+            whereConditions.push('is_admin = true');
+        } else if (filter === 'regular') {
+            whereConditions.push('is_admin = false');
+        }
+        
+        if (whereConditions.length > 0) {
+            query += ' WHERE ' + whereConditions.join(' AND ');
+        }
+        
+        query += ' ORDER BY created_at DESC';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true, 
+            users: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Admin users error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Переключение статуса администратора
+app.post('/api/admin/users/:id/toggle-admin', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { id } = req.params;
+        const { admin_id, make_admin } = req.body;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        // Не позволяем удалить себе права администратора
+        if (parseInt(id) === parseInt(admin_id)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Cannot modify your own admin status' 
+            });
+        }
+        
+        const result = await pool.query(
+            'UPDATE users SET is_admin = $1 WHERE id = $2 RETURNING id, username, is_admin',
+            [make_admin, id]
+        );
+        
+        res.json({ 
+            success: true, 
+            user: result.rows[0] 
+        });
+        
+    } catch (error) {
+        console.error('Toggle admin error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Удаление пользователя
+app.delete('/api/admin/users/:id', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { id } = req.params;
+        const { admin_id } = req.body;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        // Не позволяем удалить себя
+        if (parseInt(id) === parseInt(admin_id)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Cannot delete yourself' 
+            });
+        }
+        
+        const result = await pool.query(
+            'DELETE FROM users WHERE id = $1 RETURNING id',
+            [id]
+        );
+        
+        res.json({ 
+            success: true, 
+            message: 'User deleted successfully' 
+        });
+        
+    } catch (error) {
+        console.error('Delete user error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Получение логов
+app.get('/api/admin/logs', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id, action, user_id, date_from, date_to } = req.query;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        let query = `
+            SELECT l.*, u.username 
+            FROM logs l 
+            LEFT JOIN users u ON l.user_id = u.id 
+            WHERE 1=1
+        `;
+        
+        let params = [];
+        let paramIndex = 1;
+        
+        if (action) {
+            query += ` AND l.action = $${paramIndex}`;
+            params.push(action);
+            paramIndex++;
+        }
+        
+        if (user_id) {
+            query += ` AND l.user_id = $${paramIndex}`;
+            params.push(user_id);
+            paramIndex++;
+        }
+        
+        if (date_from) {
+            query += ` AND DATE(l.created_at) >= $${paramIndex}`;
+            params.push(date_from);
+            paramIndex++;
+        }
+        
+        if (date_to) {
+            query += ` AND DATE(l.created_at) <= $${paramIndex}`;
+            params.push(date_to);
+            paramIndex++;
+        }
+        
+        query += ' ORDER BY l.created_at DESC LIMIT 1000';
+        
+        const result = await pool.query(query, params);
+        
+        res.json({ 
+            success: true, 
+            logs: result.rows 
+        });
+        
+    } catch (error) {
+        console.error('Admin logs error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Очистка старых логов
+app.post('/api/admin/clear-old-logs', async (req, res) => {
+    try {
+        await pool.query('set search_path = "schema_ai"');
+        
+        const { admin_id } = req.body;
+        
+        // Проверяем права администратора
+        const adminCheck = await pool.query(
+            'SELECT is_admin FROM users WHERE id = $1',
+            [admin_id]
+        );
+        
+        if (adminCheck.rows.length === 0 || !adminCheck.rows[0].is_admin) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Access denied' 
+            });
+        }
+        
+        // Исправленный запрос - сначала считаем, потом удаляем
+        const countResult = await pool.query(
+            'SELECT COUNT(*) FROM logs WHERE created_at < NOW() - INTERVAL \'30 days\''
+        );
+        
+        const deleteResult = await pool.query(
+            'DELETE FROM logs WHERE created_at < NOW() - INTERVAL \'30 days\''
+        );
+        
+        const deletedCount = parseInt(countResult.rows[0].count || 0);
+        
+        res.json({ 
+            success: true, 
+            message: `Cleared ${deletedCount} old logs` 
+        });
+        
+    } catch (error) {
+        console.error('Clear logs error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
+        });
+    }
+});
+
+// Функция для логирования действий пользователей
+async function logAction(action, details = '') {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user ? user.id : null;
+        
+        await fetch('http://localhost:3000/api/logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: userId, 
+                action, 
+                details: JSON.stringify(details) 
+            })
+        });
+    } catch (error) {
+        console.error('Error logging action:', error);
+    }
+}
+
 // Регистрация
 app.post('/api/register', async (req, res) => {
     try {
@@ -33,7 +625,7 @@ app.post('/api/register', async (req, res) => {
         
         // Проверяем существование пользователя
         const existingUser = await pool.query(
-            'SELECT * FROM schema_ai.users WHERE email = $1 OR username = $2;',
+            'SELECT * FROM users WHERE email = $1 OR username = $2',
             [email, username]
         );
         
@@ -50,7 +642,7 @@ app.post('/api/register', async (req, res) => {
         
         // Сохраняем пользователя
         const result = await pool.query(
-            'INSERT INTO schema_ai.users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email',
+            'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email',
             [username, email, passwordHash]
         );
         
@@ -63,7 +655,7 @@ app.post('/api/register', async (req, res) => {
         console.error('Registration error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Server error' 
+            message: 'Server error: ' + error.message 
         });
     }
 });
@@ -160,10 +752,17 @@ app.post('/api/characters', async (req, res) => {
 
         const { user_id, name, role, description, prompt, examples, is_public } = req.body;
         
+        if (!user_id || !name || !role || !prompt) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields'
+            });
+        }
+        
         const result = await pool.query(
             `INSERT INTO characters (user_id, name, role, description, prompt, examples, is_public) 
              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-            [user_id, name, role, description, prompt, examples, is_public || false]
+            [user_id, name, role, description || '', prompt, examples || '', is_public || false]
         );
         
         res.json({ 
@@ -175,7 +774,7 @@ app.post('/api/characters', async (req, res) => {
         console.error('Create character error:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Server error' 
+            message: 'Server error: ' + error.message 
         });
     }
 });

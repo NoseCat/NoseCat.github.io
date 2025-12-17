@@ -49,4 +49,71 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        checkIfAdmin(user.id);
+    }
 });
+
+async function checkIfAdmin(userId) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/admin/check-admin?user_id=${userId}`);
+        const data = await response.json();
+        
+        if (data.success && data.is_admin) {
+            addAdminLinkToNav();
+        }
+    } catch (error) {
+        console.error('Error checking admin status:', error);
+    }
+}
+
+function addAdminLinkToNav() {
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks) {
+        // Проверяем, нет ли уже ссылки
+        if (!navLinks.querySelector('a[href="admin.html"]')) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin.html';
+            adminLink.textContent = 'Admin';
+            adminLink.style.color = '#ff6b6b'; // Красный цвет для выделения
+            adminLink.style.fontWeight = 'bold';
+            
+            // Вставляем перед логином
+            const loginLink = navLinks.querySelector('a[href="login.html"]');
+            if (loginLink) {
+                navLinks.insertBefore(adminLink, loginLink);
+            } else {
+                navLinks.appendChild(adminLink);
+            }
+        }
+    }
+}
+
+// Функция для логирования действий
+async function logAction(action, details = {}) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user ? user.id : null;
+        
+        const response = await fetch('http://localhost:3000/api/logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                user_id: userId, 
+                action, 
+                details: JSON.stringify(details) 
+            })
+        });
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error logging action:', error);
+        return { success: false };
+    }
+}
+
+// Добавить в объект window для глобальной доступности
+window.logAction = logAction;
+

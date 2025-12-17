@@ -225,18 +225,23 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch('http://localhost:3000/api/chats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: user.id })
+                body: JSON.stringify({ 
+                    user_id: user.id,
+                    name: 'New Chat'
+                })
             });
 
             const data = await response.json();
 
             if (data.success) {
+                await logAction('chat_create', { chat_id: data.chat.id });
                 userChats.unshift(data.chat);
                 renderChatsList(userChats);
                 await loadChat(data.chat.id);
             }
         } catch (error) {
             console.error('Error creating chat:', error);
+            alert('Error creating chat. Please try again.');
         }
     }
 
@@ -451,6 +456,8 @@ document.addEventListener('DOMContentLoaded', function () {
             removeThinkingIndicator(thinkingId);
 
             if (data.success) {
+                await logAction('chat_message', { chat_id: currentChat.id, character_id: currentCharacter?.id });
+
                 // Добавляем ответ в чат
                 addMessage(data.response, 'bot-message', currentCharacter ? currentCharacter.name : 'AI');
 
@@ -493,7 +500,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role, content })
             });
-
             // Обновляем локальную историю
             chatHistory.push({ role, content });
         } catch (error) {
@@ -632,10 +638,11 @@ document.addEventListener('DOMContentLoaded', function () {
             chatMessages.innerHTML = '';
             chatHistory = [];
             addMessage(`Chat cleared. Ready to talk!`, 'system-message', 'System');
+            //await logAction('chat_clear', { chat_id: currentChat.id });
         }
     }
 
     async function startNewChat() {
-        await createNewChat();
+          await createNewChat();
     }
 });

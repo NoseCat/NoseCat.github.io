@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Сохраняем информацию о пользователе
+                    await logAction('login', { email: data.user.email });
                     localStorage.setItem('user', JSON.stringify(data.user));
                     alert('Login successful!');
                     window.location.href = 'chat.html';

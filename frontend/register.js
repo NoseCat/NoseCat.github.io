@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.success) {
+                    await logAction('register', { username, email });
                     alert('Registration successful! Please login.');
                     window.location.href = 'login.html';
                 } else {
