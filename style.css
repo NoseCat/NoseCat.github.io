@@ -116,6 +116,16 @@ body.project img {
   height: auto;
 }
 
+.date {
+  display: block;
+  margin-top: -3.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  position: relative;
+}
+
 .project p {
   max-width: 80rem;
   margin: 3px;
